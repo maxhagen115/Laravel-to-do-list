@@ -1,4 +1,5 @@
 <x-guest-layout>
+<a class="btn-white absolute left-56 top-40" href="{{ Route('dashboard') }}">Back</a>
     <form method="POST" action="{{ route('register') }}">
         @csrf
 

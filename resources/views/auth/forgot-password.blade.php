@@ -1,4 +1,5 @@
 <x-guest-layout>
+<a class="btn-white absolute left-56 top-40" href="{{ Route('dashboard') }}">Back</a>
     <div class="mb-4 text-sm text-gray-600 dark:text-gray-400">
         {{ __('Forgot your password? No problem. Just let us know your email address and we will email you a password reset link that will allow you to choose a new one.') }}
     </div>
