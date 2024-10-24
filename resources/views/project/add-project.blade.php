@@ -56,7 +56,6 @@
                     } else {
                         axios.post('{{ route('save-project') }}', formData)
                             .then(response => {
-                                toastr.success('Project created successfully.');
                                 const projectId = response.data.id;
                                 window.location.href = `/project/${projectId}`;
                             })

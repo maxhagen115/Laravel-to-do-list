@@ -13,6 +13,7 @@ class Project extends Model
         'title',
         'beschrijving',
         'image',
+        'is_done',
     ];
 
     public function user()

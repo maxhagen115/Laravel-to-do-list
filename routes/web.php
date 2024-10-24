@@ -30,6 +30,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/add-project', [ProjectController::class, 'makeProject'])->name('project.add-project');
     Route::post('save-project', [ProjectController::class, 'saveProject'])->name('save-project');
     Route::post('/project/validate-title', [ProjectController::class, 'validateTitle'])->name('project.validateTitle');
+    Route::put('/project/{project}/mark-as-done', [ProjectController::class, 'markAsDone'])->name('project.markAsDone');
+
 
     Route::get('/tasks', [TaskController::class, 'index']);
     Route::post('/tasks', [TaskController::class, 'store']);

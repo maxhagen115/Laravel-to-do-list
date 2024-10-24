@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('title');
             $table->string('image')->nullable();
             $table->integer('user_id');
+            $table->string('is_done')->default('not_done');
             $table->timestamps();
         });
     }

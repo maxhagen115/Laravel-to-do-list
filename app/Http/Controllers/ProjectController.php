@@ -34,12 +34,11 @@ class ProjectController extends Controller
 
     public function showProject($id)
     {
-        try{
+        try {
             $project = Project::findorFail($id);
             $tasks = $project->tasks; // Get tasks specific to this project
             return view('project.project', compact('project', 'tasks'));
-        }
-        catch(ModelNotFoundException $exception){
+        } catch (ModelNotFoundException $exception) {
             return redirect()->to('projects');
         }
     }
@@ -66,7 +65,7 @@ class ProjectController extends Controller
 
         if (Project::where('title', $title)->exists()) {
             return redirect("/add-project")->withInput()->withError('Title already exists');
-        }else{
+        } else {
             $project = new Project();
             $project->title = $title;
             $project->image = $imageName;
@@ -83,5 +82,12 @@ class ProjectController extends Controller
         $exists = Project::where('title', $title)->exists();
 
         return response()->json(['exists' => $exists]);
+    }
+
+    public function markAsDone(Project $project)
+    {
+        $project->update(['is_done' => 'done']);
+
+        return redirect()->to('dashboard')->with('success', 'Project marked as done and can be found in your projects collection.');
     }
 }

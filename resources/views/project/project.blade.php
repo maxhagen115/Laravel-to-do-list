@@ -4,7 +4,6 @@
             cursor: pointer;
         }
 
-        /* Spinner and overlay styling */
         .spinner-overlay {
             position: fixed;
             top: 0;
@@ -12,20 +11,15 @@
             width: 100%;
             height: 100%;
             display: none;
-            /* Hidden by default */
             justify-content: center;
             align-items: center;
             background-color: rgba(0, 0, 0, 0.5);
-            /* Semi-transparent background */
             z-index: 50;
-            /* Ensure it's above other content */
         }
 
         .loader {
             border: 8px solid #f3f3f3;
-            /* Light grey */
             border-top: 8px solid #3490dc;
-            /* Blue */
             border-radius: 50%;
             width: 60px;
             height: 60px;
@@ -42,25 +36,16 @@
             }
         }
 
-        /* Dummy task styling with fade effect */
         .dummy-task {
             background-color: #e2e8f0;
-            /* Light gray for dummy tasks */
             color: #4a5568;
-            /* Darker gray text */
             margin-bottom: 0.5rem;
-            /* Space between tasks */
             padding: 0.75rem;
-            /* Padding inside the task */
             border-radius: 0.375rem;
-            /* Rounded corners */
             opacity: 1;
-            /* Full opacity */
             transition: opacity 0.5s ease;
-            /* Smooth fade effect */
         }
 
-        /* Fade effect for each subsequent dummy task */
         .dummy-task:nth-child(2) {
             opacity: 0.9;
         }
@@ -77,18 +62,15 @@
             opacity: 0.6;
         }
 
-        /* Ensure the modal is displayed above other content */
         #modal {
             display: none;
             position: fixed;
             z-index: 100;
-            /* Higher z-index to overlay other content */
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             background-color: rgba(0, 0, 0, 0.5);
-            /* Semi-transparent background */
             justify-content: center;
             align-items: center;
         }
@@ -98,9 +80,7 @@
             padding: 20px;
             border-radius: 8px;
             width: 50%;
-            /* Adjust the width as per your design */
             max-width: 600px;
-            /* Max width for larger screens */
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
 
@@ -141,12 +121,22 @@
 
     <body class="bg-gray-200">
         <div class="container mx-auto p-4">
-            <h1 class="text-3xl font-bold mb-4">Project Task Board for {{ $project->title }}</h1>
+            <h1 class="text-3xl font-bold mb-4">Project Task Board for <span class="text-blue-500">{{ Str::ucfirst($project->title) }}</span></h1>
 
+
+            @if ($project->is_done == 'not_done')
             <!-- Button to open the modal -->
             <button id="openModal" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-4">
                 Create Task
             </button>
+            <form action="{{ route('project.markAsDone', $project->id) }}" method="POST" style="display: inline;">
+                @csrf
+                @method('PUT')
+                <button type="submit" class="float-right bg-green-500 hover:bg-green-600 text-white font-semibold px-4 py-2 rounded shadow" onclick="return confirm('Are you sure you want to mark this project as done?')">
+                    Mark as Done
+                </button>
+            </form>
+            @endif
 
             <!-- Modal -->
             <div id="modal" class="fixed inset-0 bg-gray-800 bg-opacity-50 hidden flex items-center justify-center">
@@ -176,7 +166,7 @@
             </div>
 
             <!-- Task Columns -->
-            <div id="taskColumns" class="flex justify-between space-x-4 hidden"> <!-- Initially hidden -->
+            <div id="taskColumns" class="flex justify-between space-x-4 hidden">
                 <!-- Planning Column -->
                 <div class="w-1/3 bg-white p-4 rounded shadow-md">
                     <h2 class="text-2xl font-semibold mb-2">Planning</h2>
@@ -207,268 +197,277 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.16/dist/tailwind.min.js"></script>
         <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                const projectId = {{ $project->id }}; // Ensure you have the project ID available in the Blade file
-                const loadingOverlay = document.getElementById('loadingOverlay');
-                const taskColumns = document.getElementById('taskColumns');
+        document.addEventListener('DOMContentLoaded', function() {
+            const projectId = {{ $project->id }};
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            const taskColumns = document.getElementById('taskColumns');
 
-                const openModalButton = document.getElementById('openModal');
-                const closeModalButton = document.getElementById('closeModal');
-                const createTaskBtn = document.getElementById('createTask');
-                const modal = document.getElementById('modal');
+            const openModalButton = document.getElementById('openModal');
+            const closeModalButton = document.getElementById('closeModal');
+            const createTaskBtn = document.getElementById('createTask');
+            const modal = document.getElementById('modal');
 
-                // Dummy task titles (customize as needed)
-                const dummyTasks = [
-                    "This is a dummy task. You can create real tasks!",
-                    "Add your first task to get started!",
-                    "Your tasks will appear here!",
-                    "Create a new task using the button above!",
-                    "This is a placeholder task. Add your tasks!"
-                ];
+            const dummyTasks = [
+                "This is a dummy task. You can create real tasks!",
+                "Add your first task to get started!",
+                "Your tasks will appear here!",
+                "Create a new task using the button above!",
+                "This is a placeholder task. Add your tasks!"
+            ];
 
-                // Fetch tasks and render them on page load
-                showLoadingSpinner();
-                fetchTasks().then(() => {
-                    hideLoadingSpinner(); // Hide spinner after fetching tasks
-                }).catch(() => {
-                    hideLoadingSpinner(); // Also hide spinner in case of an error
-                });
+            showLoadingSpinner();
+            fetchTasks().then(() => {
+                hideLoadingSpinner();
+            }).catch(() => {
+                hideLoadingSpinner();
+            });
 
-                // Function to fetch tasks and render them
-                function fetchTasks() {
-                    return axios.get(`/projects/${projectId}/tasks`)
-                        .then(response => {
-                            const tasks = response.data;
+            // Function to fetch tasks and render them
+            function fetchTasks() {
+                return axios.get(`/projects/${projectId}/tasks`)
+                    .then(response => {
+                        const tasks = response.data;
 
-                            // Clear existing tasks in all columns
-                            document.getElementById('planning').innerHTML = '';
-                            document.getElementById('doing').innerHTML = '';
-                            document.getElementById('done').innerHTML = '';
+                        // Clear existing tasks in all columns
+                        document.getElementById('planning').innerHTML = '';
+                        document.getElementById('doing').innerHTML = '';
+                        document.getElementById('done').innerHTML = '';
 
-                            if (tasks.length === 0) {
-                                // If no tasks are found, add dummy tasks to each column
-                                addDummyTasks('planning');
-                                addDummyTasks('doing');
-                                addDummyTasks('done');
-                            } else {
-                                // Render real tasks in the appropriate columns
-                                tasks.forEach(task => {
-                                    addTaskToColumn(task);
-                                });
+                        if (tasks.length === 0) {
+                            // If no tasks are found, add dummy tasks to each column
+                            addDummyTasks('planning');
+                            addDummyTasks('doing');
+                            addDummyTasks('done');
+                        } else {
+                            // Render real tasks in the appropriate columns
+                            tasks.forEach(task => {
+                                addTaskToColumn(task);
+                            });
 
-                                // Remove dummy tasks in all columns if real tasks exist
-                                removeDummyTasks('planning');
-                                removeDummyTasks('doing');
-                                removeDummyTasks('done');
-                            }
-
-                            // Show the task columns after rendering tasks
-                            taskColumns.classList.remove('hidden');
-
-                            // Reinitialize sortable after adding tasks
-                            initializeSortable();
-                        })
-                        .catch(error => {
-                            toastr.error('Failed to load tasks');
-                        });
-                }
-
-                // Function to show the loading spinner
-                function showLoadingSpinner() {
-                    loadingOverlay.style.display = 'flex';
-                }
-
-                // Function to hide the loading spinner
-                function hideLoadingSpinner() {
-                    loadingOverlay.style.display = 'none';
-                }
-
-                // Function to open the modal
-                function openModal() {
-                    modal.style.display = 'flex';
-                }
-
-                // Function to close the modal
-                function closeModal() {
-                    modal.style.display = 'none';
-                    document.getElementById('taskForm').reset(); // Reset the form fields when modal is closed
-                }
-
-                // Event listener for the open modal button
-                openModalButton.addEventListener('click', openModal);
-
-                // Event listener for the close modal button
-                closeModalButton.addEventListener('click', closeModal);
-
-                // Create new task
-                createTaskBtn.addEventListener('click', function() {
-                    const title = document.getElementById('title').value;
-                    const status = document.getElementById('status').value;
-
-                    showLoadingSpinner();
-                    axios.post(`/projects/${projectId}/tasks`, {
-                            title,
-                            status
-                        })
-                        .then(response => {
-                            toastr.success('Task created successfully');
-                            const task = response.data;
-
-                            // Remove dummy tasks in all columns
+                            // Remove dummy tasks in all columns if real tasks exist
                             removeDummyTasks('planning');
                             removeDummyTasks('doing');
                             removeDummyTasks('done');
+                        }
 
-                            // Add the new task to the specified column
-                            addTaskToColumn(task);
+                        // Show the task columns after rendering tasks
+                        taskColumns.classList.remove('hidden');
 
-                            // Reset the form and close the modal
-                            document.getElementById('taskForm').reset();
-                            closeModal();
-                        })
-                        .catch(error => {
-                            toastr.error('Failed to create task');
-                        })
-                        .finally(() => {
-                            hideLoadingSpinner();
-                        });
-                });
-
-                // Function to render a new task in the appropriate column
-                function addTaskToColumn(task) {
-                    const taskElement = document.createElement('div');
-                    taskElement.className = 'task p-2 mb-2 bg-blue-100 rounded shadow';
-                    taskElement.innerText = task.title;
-                    taskElement.dataset.id = task.id;
-                    taskElement.dataset.status = task.status; // Track the original status
-
-                    document.getElementById(task.status).appendChild(taskElement);
-                }
-
-                // Function to add dummy tasks to a column
-                function addDummyTasks(columnId) {
-                    const column = document.getElementById(columnId);
-                    dummyTasks.forEach((title, index) => {
-                        const dummyTaskElement = document.createElement('div');
-                        dummyTaskElement.className = 'dummy-task p-2 mb-2 rounded shadow';
-                        dummyTaskElement.innerText = title;
-                        dummyTaskElement.style.opacity = 1 - (index * 0.1); // Gradual fading effect
-                        column.appendChild(dummyTaskElement);
+                        // Reinitialize sortable after adding tasks
+                        initializeSortable();
+                    })
+                    .catch(error => {
+                        toastr.error('Failed to load tasks');
                     });
-                }
+            }
 
-                // Function to remove dummy tasks from a column
-                function removeDummyTasks(columnId) {
-                    const column = document.getElementById(columnId);
-                    const dummyTasks = column.querySelectorAll('.dummy-task');
-                    dummyTasks.forEach(task => task.remove());
-                }
+            // Function to show the loading spinner
+            function showLoadingSpinner() {
+                loadingOverlay.style.display = 'flex';
+            }
 
-                // Function to initialize sortable for each task column
-                function initializeSortable() {
-                    ['planning', 'doing', 'done'].forEach(status => {
-                        new Sortable(document.getElementById(status), {
-                            group: 'tasks',
-                            animation: 150,
-                            onStart: function(evt) {
-                                // Save the original status and initial order on drag start
-                                evt.item.dataset.originalStatus = evt.item.dataset.status;
+            // Function to hide the loading spinner
+            function hideLoadingSpinner() {
+                loadingOverlay.style.display = 'none';
+            }
 
-                                // Capture the initial order of tasks in the column
-                                const initialOrder = Array.from(evt.to.children).map(task => task
-                                    .dataset.id);
-                                evt.to.dataset.initialOrder = JSON.stringify(initialOrder);
-                            },
-                            onEnd: function(evt) {
-                                const newStatus = evt.to.id;
-                                const originalStatus = evt.item.dataset.originalStatus;
-                                const taskId = evt.item.dataset.id;
-                                const tasks = Array.from(evt.to.children);
+            // Function to open the modal
+            function openModal() {
+                modal.style.display = 'flex';
+            }
 
-                                // Determine if the task's status has changed
-                                const statusChanged = newStatus !== originalStatus;
+            // Function to close the modal
+            function closeModal() {
+                modal.style.display = 'none';
+                document.getElementById('taskForm').reset(); // Reset the form fields when modal is closed
+            }
 
-                                // Compare the initial and final order of tasks in the same column
-                                const initialOrder = JSON.parse(evt.to.dataset.initialOrder ||
-                                    "[]");
-                                const finalOrder = tasks.map(task => task.dataset.id);
-                                const orderChanged = JSON.stringify(initialOrder) !== JSON
-                                    .stringify(finalOrder);
+            // Event listener for the open modal button
+            openModalButton.addEventListener('click', openModal);
 
-                                showLoadingSpinner();
-                                // Handle status change and order change separately and clearly
-                                if (statusChanged) {
-                                    // Update task status if it has changed
-                                    updateTaskStatus(taskId, newStatus)
-                                        .then(() => {
-                                            toastr.success('Task status updated successfully');
-                                            // Update the task data in the DOM
-                                            evt.item.dataset.status = newStatus;
-                                            // After status update, check if order has changed and update it
-                                            if (orderChanged) {
-                                                updateTaskOrder(newStatus, tasks);
-                                            }
-                                        })
-                                        .catch(error => {
-                                            toastr.error('Failed to update task status');
-                                        })
-                                        .finally(() => {
-                                            hideLoadingSpinner();
-                                        });
-                                } else if (orderChanged) {
-                                    // Update task order if it has changed
-                                    updateTaskOrder(newStatus, tasks)
-                                        .then(() => {
-                                            toastr.success('Task order updated successfully');
-                                        })
-                                        .catch(error => {
-                                            toastr.error('Failed to update task order');
-                                        })
-                                        .finally(() => {
-                                            hideLoadingSpinner();
-                                        });
-                                } else {
-                                    // No status or order change, just display success message
-                                    toastr.error('Task not moved');
-                                    hideLoadingSpinner(); // Ensure spinner is hidden
-                                }
-                            }
-                        });
+            // Event listener for the close modal button
+            closeModalButton.addEventListener('click', closeModal);
+
+            // Create new task
+            createTaskBtn.addEventListener('click', function() {
+                const title = document.getElementById('title').value;
+                const status = document.getElementById('status').value;
+
+                showLoadingSpinner();
+                axios.post(`/projects/${projectId}/tasks`, {
+                        title,
+                        status
+                    })
+                    .then(response => {
+                        toastr.success('Task created successfully');
+                        const task = response.data;
+
+                        // Remove dummy tasks in all columns
+                        removeDummyTasks('planning');
+                        removeDummyTasks('doing');
+                        removeDummyTasks('done');
+
+                        // Add the new task to the specified column
+                        addTaskToColumn(task);
+
+                        // Reset the form and close the modal
+                        document.getElementById('taskForm').reset();
+                        closeModal();
+                    })
+                    .catch(error => {
+                        toastr.error('Failed to create task');
+                    })
+                    .finally(() => {
+                        hideLoadingSpinner();
                     });
-                }
-
-
-                // Function to update task status
-                function updateTaskStatus(taskId, newStatus) {
-                    return axios.put(`/projects/${projectId}/tasks/${taskId}`, {
-                        status: newStatus
-                    });
-                }
-
-                // Function to update task order
-                function updateTaskOrder(newStatus, tasks) {
-                    // Check if any of the tasks are dummy tasks
-                    const hasDummyTasks = tasks.some(task => task.dataset.id.startsWith('dummy'));
-
-                    if (hasDummyTasks) {
-                        toastr.success('Task moved');
-                        return Promise.resolve(); // Resolve immediately for dummy tasks
-                    }
-
-                    // For real tasks, proceed with updating the order
-                    let taskOrder = tasks.map((task, index) => ({
-                        id: task.dataset.id,
-                        order: index + 1, // Position in the new status column
-                        status: newStatus // Ensure to pass the current status
-                    }));
-
-                    return axios.post(`/projects/${projectId}/tasks/update-order`, {
-                        tasks: taskOrder
-                    });
-                }
             });
-        </script>
 
+            // Function to render a new task in the appropriate column
+            function addTaskToColumn(task) {
+                const taskElement = document.createElement('div');
+                taskElement.className = 'task p-2 mb-2 rounded shadow';
+                taskElement.innerText = task.title;
+                taskElement.dataset.id = task.id;
+                taskElement.dataset.status = task.status; // Track the original status
+
+                // Determine the background color based on the task status
+                switch (task.status) {
+                    case 'planning':
+                        taskElement.classList.add('bg-blue-200'); // Subtle blue
+                        break;
+                    case 'doing':
+                        taskElement.classList.add('bg-orange-200'); // Subtle yellow
+                        break;
+                    case 'done':
+                        taskElement.classList.add('bg-green-200'); // Subtle green
+                        break;
+                    default:
+                        taskElement.classList.add('bg-gray-100'); // Default background color
+                        break;
+                }
+
+                document.getElementById(task.status).appendChild(taskElement);
+            }
+
+
+            // Function to add dummy tasks to a column
+            function addDummyTasks(columnId) {
+                const column = document.getElementById(columnId);
+                dummyTasks.forEach((title, index) => {
+                    const dummyTaskElement = document.createElement('div');
+                    dummyTaskElement.className = 'dummy-task p-2 mb-2 rounded shadow';
+                    dummyTaskElement.innerText = title;
+                    dummyTaskElement.style.opacity = 1 - (index * 0.1); // Gradual fading effect
+                    column.appendChild(dummyTaskElement);
+                });
+            }
+
+            // Function to remove dummy tasks from a column
+            function removeDummyTasks(columnId) {
+                const column = document.getElementById(columnId);
+                const dummyTasks = column.querySelectorAll('.dummy-task');
+                dummyTasks.forEach(task => task.remove());
+            }
+
+            // Function to initialize sortable for each task column
+            function initializeSortable() {
+                ['planning', 'doing', 'done'].forEach(status => {
+                    new Sortable(document.getElementById(status), {
+                        group: 'tasks',
+                        animation: 150,
+                        onStart: function(evt) {
+                            // Save the original status and initial order on drag start
+                            evt.item.dataset.originalStatus = evt.item.dataset.status;
+
+                            // Capture the initial order of tasks in the column
+                            const initialOrder = Array.from(evt.to.children).map(task => task.dataset.id);
+                            evt.to.dataset.initialOrder = JSON.stringify(initialOrder);
+                        },
+                        onEnd: function(evt) {
+                            const newStatus = evt.to.id;
+                            const originalStatus = evt.item.dataset.originalStatus;
+                            const taskId = evt.item.dataset.id;
+                            const tasks = Array.from(evt.to.children);
+
+                            // Check if the task is a dummy task
+                            const isDummyTask = evt.item.classList.contains('dummy-task');
+                            if (isDummyTask) {
+                                toastr.success('Dummy task moved');
+                                return; // Exit early for dummy tasks
+                            }
+
+                            // Determine if the task's status has changed
+                            const statusChanged = newStatus !== originalStatus;
+
+                            // Compare the initial and final order of tasks in the same column
+                            const initialOrder = JSON.parse(evt.to.dataset.initialOrder || "[]");
+                            const finalOrder = tasks.map(task => task.dataset.id);
+                            const orderChanged = JSON.stringify(initialOrder) !== JSON.stringify(finalOrder);
+
+                            showLoadingSpinner();
+
+                            // Handle status change and order change separately and clearly
+                            if (statusChanged) {
+                                // Update task status if it has changed
+                                updateTaskStatus(taskId, newStatus)
+                                    .then(() => {
+                                        toastr.success('Task status updated successfully');
+                                        // Update the task data in the DOM
+                                        evt.item.dataset.status = newStatus;
+
+                                        // Re-render the task to apply the correct background color
+                                        addTaskToColumn({ title: evt.item.innerText, id: taskId, status: newStatus });
+                                        evt.item.remove(); // Remove the old task element
+                                    })
+                                    .catch(error => {
+                                        toastr.error('Failed to update task status');
+                                    })
+                                    .finally(() => {
+                                        hideLoadingSpinner();
+                                    });
+                            } else if (orderChanged) {
+                                // Update task order if it has changed
+                                updateTaskOrder(newStatus, tasks)
+                                    .then(() => {
+                                        toastr.success('Task order updated successfully');
+                                    })
+                                    .catch(error => {
+                                        toastr.error('Failed to update task order');
+                                    })
+                                    .finally(() => {
+                                        hideLoadingSpinner();
+                                    });
+                            } else {
+                                // No status or order change, just display success message
+                                toastr.error('Task not moved');
+                                hideLoadingSpinner(); // Ensure spinner is hidden
+                            }
+                        }
+                    });
+                });
+            }
+
+            // Function to update task status
+            function updateTaskStatus(taskId, newStatus) {
+                return axios.put(`/projects/${projectId}/tasks/${taskId}`, {
+                    status: newStatus
+                });
+            }
+
+            // Function to update task order
+            function updateTaskOrder(newStatus, tasks) {
+                let taskOrder = tasks.map((task, index) => ({
+                    id: task.dataset.id,
+                    order: index + 1, // Position in the new status column
+                    status: newStatus // Ensure to pass the current status
+                }));
+
+                return axios.post(`/projects/${projectId}/tasks/update-order`, {
+                    tasks: taskOrder
+                });
+            }
+        });
+    </script>
 
     </body>
 </x-app-layout>

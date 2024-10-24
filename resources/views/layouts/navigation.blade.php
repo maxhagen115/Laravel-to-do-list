@@ -90,18 +90,6 @@
         </div>
     </div>
 
-    <!-- Left Navbar -->
-    <div id="navbar" class="bg-white shadow-md p-4 fixed top-0 pt-20 left-0 w-24 h-full hidden lg:block ">
-
-        <!-- Navbar Links -->
-        <div class="mt-4">
-            <a href="#" class="block text-gray-700 hover:text-gray-900 py-2">icon</a>
-            <a href="#" class="block text-gray-700 hover:text-gray-900 py-2">icon</a>
-            <a href="#" class="block text-gray-700 hover:text-gray-900 py-2">icon</a>
-            <!-- Add more links as needed -->
-        </div>
-    </div>
-
     <!-- Responsive Navigation Menu -->
     <div :class="{ 'block': open, 'hidden': !open }" class="hidden sm:hidden">
         <div class="pt-2 pb-3 space-y-1">
