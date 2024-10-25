@@ -13,11 +13,15 @@ class ProjectController extends Controller
     public function showAllProjects(Request $request)
     {
         $search = $request->input('search');
+        $userId = auth()->id();
+
+        $query = Project::where('user_id', $userId)
+            ->where('is_done', 'not_done');
 
         if ($search) {
-            $projects = Project::where('title', 'like', "%{$search}%")->get();
+            $projects = $query->where('title', 'like', "%{$search}%")->get();
         } else {
-            $projects = Project::all();
+            $projects = $query->get();
         }
 
         if ($request->ajax()) {
@@ -26,6 +30,7 @@ class ProjectController extends Controller
 
         return view('projects', compact('projects', 'search'));
     }
+
 
     public function makeProject()
     {
@@ -89,10 +94,29 @@ class ProjectController extends Controller
         if ($project->tasks()->count() > 0) {
             $project->is_done = 'done';
             $project->save();
-    
-            return redirect()->back()->with('success', 'Project marked as done and can be found in your projects collection.');
+
+            return redirect()->to('dashboard')->with('success', 'Project marked as done and can be found in your collection.');
         } else {
             return redirect()->back()->with('error', 'Cannot mark project as done without tasks.');
         }
+    }
+
+    public function markAsDoing(Project $project){
+        $project->is_done = 'not_done';
+        $project->save();
+
+        return redirect()->back()->with('success', 'Project status changed to ongoing.');
+    }
+
+    public function showCollection()
+    {
+
+        $user = auth()->user();
+
+        // Fetch all projects of the authenticated user
+        $userProjects = Project::where('user_id', $user->id)
+            ->get();
+
+        return view('collection', compact('userProjects'));
     }
 }

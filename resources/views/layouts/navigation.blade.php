@@ -22,6 +22,11 @@
                         <p class="text-black">Projects</p>
                     </x-nav-link>
                 </div>
+                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                    <x-nav-link :href="route('show.collection')" :active="request()->routeIs('show.collection')">
+                        <p class="text-black">Collection</p>
+                    </x-nav-link>
+                </div>
             </div>
 
             <div class="flex items-center mb-4">

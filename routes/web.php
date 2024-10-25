@@ -17,8 +17,8 @@ use App\Http\Controllers\DashboardController;
 |
 */
 
-Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
-Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+Route::get('/', [DashboardController::class, 'dashboard'])->name('dashboard');
+Route::get('/dashboard', [DashboardController::class, 'dashboard'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -31,14 +31,10 @@ Route::middleware('auth')->group(function () {
     Route::post('save-project', [ProjectController::class, 'saveProject'])->name('save-project');
     Route::post('/project/validate-title', [ProjectController::class, 'validateTitle'])->name('project.validateTitle');
     Route::put('/project/{project}/mark-as-done', [ProjectController::class, 'markAsDone'])->name('project.markAsDone');
+    Route::put('/project/{project}/mark-as-doing', [ProjectController::class, 'markAsDoing'])->name('project.markAsDoing');
 
+    Route::get('/collection', [ProjectController::class, 'showCollection'])->name('show.collection');
 
-    Route::get('/tasks', [TaskController::class, 'index']);
-    Route::post('/tasks', [TaskController::class, 'store']);
-    Route::put('/tasks/{task}', [TaskController::class, 'update']);
-    Route::post('/tasks/update-order', [TaskController::class, 'updateOrder']);
-
-    // Task routes
     Route::prefix('projects/{projectId}')->group(function () {
         Route::get('tasks', [TaskController::class, 'index'])->name('tasks.index');
         Route::post('tasks', [TaskController::class, 'store'])->name('tasks.store');
