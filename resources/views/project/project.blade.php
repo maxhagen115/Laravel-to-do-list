@@ -124,19 +124,33 @@
             <h1 class="text-3xl font-bold mb-4">Project Task Board for <span class="text-blue-500">{{ Str::ucfirst($project->title) }}</span></h1>
 
 
-            @if ($project->is_done == 'not_done')
+            
             <!-- Button to open the modal -->
             <button id="openModal" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-4">
                 Create Task
             </button>
-            <form action="{{ route('project.markAsDone', $project->id) }}" method="POST" style="display: inline;">
+            <!-- <form action="{{ route('project.markAsDone', $project->id) }}" method="POST" style="display: inline;">
                 @csrf
                 @method('PUT')
                 <button type="submit" class="float-right bg-green-500 hover:bg-green-600 text-white font-semibold px-4 py-2 rounded shadow" onclick="return confirm('Are you sure you want to mark this project as done?')">
-                    Mark as Done
+                    Mark project as Done
                 </button>
-            </form>
+            </form> -->
+
+            @if ($project->tasks->count() > 0)
+                <form action="{{ route('project.markAsDone', $project->id) }}" method="POST" style="display: inline;">
+                    @csrf
+                    @method('PUT')
+                    <button type="submit" id="markAsDoneButton" class="float-right bg-green-500 hover:bg-green-600 text-white font-semibold px-4 py-2 rounded shadow" onclick="return confirm('Are you sure you want to mark this project as done?')">
+                        Mark project as Done
+                    </button>
+                </form>
+            @else
+                <button id="markAsDoneButton" class="bg-gray-500 text-white px-4 py-2 rounded float-right cursor-not-allowed" disabled>
+                    Mark project as Done
+                </button>
             @endif
+
 
             <!-- Modal -->
             <div id="modal" class="fixed inset-0 bg-gray-800 bg-opacity-50 hidden flex items-center justify-center">
@@ -310,6 +324,9 @@
                         // Add the new task to the specified column
                         addTaskToColumn(task);
 
+                        // Update the button visibility based on the new task count
+                        updateMarkAsDoneButton();
+
                         // Reset the form and close the modal
                         document.getElementById('taskForm').reset();
                         closeModal();
@@ -321,6 +338,29 @@
                         hideLoadingSpinner();
                     });
             });
+
+            // Function to update the Mark as Done button visibility
+            function updateMarkAsDoneButton() {
+                const markAsDoneButton = document.getElementById('markAsDoneButton');
+                
+                // Get the project tasks count directly from the Blade data or through a new Axios call
+                const projectTasksCount = {{ $project->tasks->count() }}; // Get the initial count directly from the server
+
+                // Check if the button should be enabled or disabled
+                if (projectTasksCount > 0) {
+                    markAsDoneButton.classList.remove('bg-gray-500', 'cursor-not-allowed');
+                    markAsDoneButton.classList.add('bg-green-500', 'hover:bg-green-600');
+                    markAsDoneButton.disabled = false; // Enable the button
+                    markAsDoneButton.innerText = "Mark project as Done"; // Optional: Update text if needed
+                } else {
+                    markAsDoneButton.classList.add('bg-gray-500', 'cursor-not-allowed');
+                    markAsDoneButton.classList.remove('bg-green-500', 'hover:bg-green-600');
+                    markAsDoneButton.disabled = true; // Disable the button
+                    markAsDoneButton.innerText = "Mark project as Done"; // Optional: Reset text if needed
+                }
+            }
+
+
 
             // Function to render a new task in the appropriate column
             function addTaskToColumn(task) {

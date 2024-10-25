@@ -86,8 +86,13 @@ class ProjectController extends Controller
 
     public function markAsDone(Project $project)
     {
-        $project->update(['is_done' => 'done']);
-
-        return redirect()->to('dashboard')->with('success', 'Project marked as done and can be found in your projects collection.');
+        if ($project->tasks()->count() > 0) {
+            $project->is_done = 'done';
+            $project->save();
+    
+            return redirect()->back()->with('success', 'Project marked as done and can be found in your projects collection.');
+        } else {
+            return redirect()->back()->with('error', 'Cannot mark project as done without tasks.');
+        }
     }
 }
