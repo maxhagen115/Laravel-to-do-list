@@ -28,22 +28,6 @@
 
 
     <script>
-        document.getElementById('title').addEventListener('input', function() {
-            const title = this.value;
-            if (title.length > 0) {
-                axios.post('{{ route('project.validateTitle') }}', { title: title })
-                    .then(response => {
-                        if (response.data.exists) {
-                            toastr.error('Title already exists.');
-                        }
-
-                    })
-                    .catch(error => {
-                        console.error('Error checking title:', error);
-                    });
-            }
-        });
-
         document.getElementById('projectForm').addEventListener('submit', function(event) {
             event.preventDefault();
             const formData = new FormData(this);

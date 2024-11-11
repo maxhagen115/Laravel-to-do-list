@@ -43,6 +43,9 @@
                     const projectList = document.getElementById('project-list');
                     projectList.innerHTML = '';
 
+                    if(projects.length === 0){
+                    projectList.innerHTML = '<p class="text-gray-500 mf-2">No results found</p>';
+                    }else {
                     projects.forEach(project => {
                         const projectCard = `
                         <div class="relative bg-white shadow-lg rounded-lg overflow-hidden">
@@ -54,6 +57,7 @@
                     `;
                         projectList.innerHTML += projectCard;
                     });
+                }
                 })
                 .catch(error => {
                     console.error('Error fetching projects:', error);
