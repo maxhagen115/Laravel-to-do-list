@@ -12,24 +12,28 @@ class DashboardController extends Controller
 {
     public function dashboard()
     {
-        $user = auth()->user();
+        if (Auth::user()) {
+            $user = auth()->user();
     
-        // Fetch ongoing projects (not done)
-        $ongoingProjects = Project::where('user_id', $user->id)
-            ->where('is_done', 'not_done')
+            // Fetch ongoing projects (not done)
+            $ongoingProjects = Project::where('user_id', $user->id)
+                ->where('is_done', 'not_done')
+                ->take(4)
+                ->get();
+        
+            // Fetch doing tasks from all projects
+            $doingTasks = Task::where('status', 'doing')
+                ->with('project')
+                ->get();
+        
+            // Fetch all projects of the authenticated user
+            $userProjects = Project::where('user_id', $user->id)
             ->take(4)
             ->get();
-    
-        // Fetch doing tasks from all projects
-        $doingTasks = Task::where('status', 'doing')
-            ->with('project')
-            ->get();
-    
-        // Fetch all projects of the authenticated user
-        $userProjects = Project::where('user_id', $user->id)
-        ->take(4)
-        ->get();
-    
-        return view('dashboard', compact('ongoingProjects', 'doingTasks', 'userProjects'));
+        
+            return view('dashboard', compact('ongoingProjects', 'doingTasks', 'userProjects'));
+        }else{
+            return view(view: 'welcome',);
+        }
     }
 }
