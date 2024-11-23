@@ -25,8 +25,7 @@
             </div>
         </div>
     </div>
-
-
+    
     <script>
         document.getElementById('projectForm').addEventListener('submit', function(event) {
             event.preventDefault();
@@ -45,13 +44,11 @@
                             })
                             .catch(error => {
                                 toastr.error('Error submitting form.');
-                                console.error('Error submitting form:', error);
                             });
                     }
                 })
                 .catch(error => {
                     toastr.error('Error checking title.');
-                    console.error('Error checking title:', error);
                 });
         });
     </script>

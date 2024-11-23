@@ -52,10 +52,9 @@ class ProjectController extends Controller
     {
         $request->validate([
             'title' => 'required',
-            'image' => 'image|nullable|max:2048|dimensions:max_height=250'
+            'image' => 'image|nullable|max:2048',
         ], [
             'title.required' => 'The title input is required',
-            'image.dimensions' => 'max 250 pixels',
         ]);
 
         $title = $request->title;

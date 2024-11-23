@@ -48,4 +48,14 @@ class User extends Authenticatable
     {
         return $this->profile_picture ? Storage::url($this->profile_picture) : asset('default.jpeg');
     }
+
+    public function projects()
+    {
+        return $this->hasMany(Project::class);
+    }
+    
+    public function tasks()
+    {
+        return $this->hasMany(Task::class);
+    }
 }

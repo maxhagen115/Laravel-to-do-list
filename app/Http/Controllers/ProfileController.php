@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Redirect;
 use App\Http\Requests\ProfileUpdateRequest;
 use App\Models\Project;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
 
 
 class ProfileController extends Controller
@@ -57,19 +58,44 @@ class ProfileController extends Controller
      */
     public function destroy(Request $request): RedirectResponse
     {
-        $request->validateWithBag('userDeletion', [
+        $request->validate([
             'password' => ['required', 'current_password'],
         ]);
-
+    
         $user = $request->user();
-
-        Auth::logout();
-
-        $user->delete();
-
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
-
-        return Redirect::to('/');
+    
+        // Begin a transaction to ensure all deletes are handled atomically
+        DB::beginTransaction();
+    
+        try {
+            // Delete related projects and tasks
+            $user->projects()->each(function ($project) {
+                // Delete related tasks first
+                $project->tasks()->delete();
+                // Now delete the project
+                $project->delete();
+            });
+    
+            // Delete the user account
+            $user->delete();
+    
+            // Log the user out
+            Auth::logout();
+    
+            // Invalidate the session and regenerate the CSRF token
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+    
+            // Commit the transaction
+            DB::commit();
+    
+            return Redirect::to('/')->with('status', 'Account deleted successfully');
+        } catch (\Exception $e) {
+            // Rollback the transaction in case of any error
+            DB::rollBack();
+    
+            // Return a response with an error message
+            return back()->withErrors(['error' => 'There was an issue deleting your account. Please try again later.']);
+        }
     }
 }

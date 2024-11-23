@@ -1,6 +1,6 @@
 <x-app-layout>
         <div class="container mx-auto p-6">
-            <h1 class="text-3xl font-bold mb-6 flex-1">Your Projects</h1>
+            <h1 class="text-3xl font-bold mb-6 flex-1">Your Ongoing Projects</h1>
             <a href="{{ route('project.add-project') }}" class="btn-primary float-right">Add Project</a>
 
             <form action="{{ route('projects') }}" method="GET" class="mb-8">
@@ -9,20 +9,20 @@
 
             <div class="bg-white shadow-lg rounded-lg p-4">
                 @if (count($projects) > 0)
-                    <div id="project-list" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-                        @foreach ($projects as $project)
+                <div id="project-list" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+                    @foreach ($projects as $project)
+                        <a href="{{ route('project.show', $project->id) }}" class="block">
                             <div class="relative bg-white shadow-lg rounded-lg overflow-hidden">
                                 <img src="{{ url('/images/project_img/' . $project->image) }}" alt="{{ $project->title }}" class="w-full h-64 object-cover">
                                 <div class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-                                    <h2>
-                                        <a href="{{ route('project.show', $project->id) }}" class="text-white text-xl font-bold text-center hover:underline">
-                                            {{ Str::ucfirst($project->title) }}
-                                        </a>
+                                    <h2 class="text-white text-xl font-bold text-center">
+                                        {{ Str::ucfirst($project->title) }}
                                     </h2>
                                 </div>
                             </div>
-                        @endforeach
-                    </div>
+                        </a>
+                    @endforeach
+                </div>
                 @else
                     <p>No projects created yet</p>
                 @endif
@@ -48,13 +48,15 @@
                     }else {
                     projects.forEach(project => {
                         const projectCard = `
-                        <div class="relative bg-white shadow-lg rounded-lg overflow-hidden">
-                            <img src="${baseUrl}/${project.image}" alt="${project.title}" class="w-full h-64 object-cover">
-                            <div class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-                                <h2><a href="/project/${project.id}" class="text-white text-xl font-bold text-center hover:underline">${project.title}</a></h2>
-                            </div>
-                        </div>
-                    `;
+                            <a href="/project/${project.id}" class="block">
+                                <div class="relative bg-white shadow-lg rounded-lg overflow-hidden">
+                                    <img src="${baseUrl}/${project.image}" alt="${project.title}" class="w-full h-64 object-cover">
+                                    <div class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+                                        <h2 class="text-white text-xl font-bold text-center">${project.title}</h2>
+                                    </div>
+                                </div>
+                            </a>
+                        `;
                         projectList.innerHTML += projectCard;
                     });
                 }
