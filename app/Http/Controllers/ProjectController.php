@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Validation\Rule;
 
 class ProjectController extends Controller
 {
@@ -48,46 +49,42 @@ class ProjectController extends Controller
         }
     }
 
+
     public function saveProject(Request $request)
     {
+        // Validate the request
         $request->validate([
-            'title' => 'required',
-            'image' => 'image|nullable|max:2048',
+            'title' => [
+                'required',
+                Rule::unique('projects')->where(function ($query) {
+                    return $query->where('user_id', auth()->id());
+                }),
+            ],
+            'image' => 'nullable|image|max:2048', // Nullable image file with max size 2MB
         ], [
             'title.required' => 'The title input is required',
+            'title.unique' => 'You already have a project with this title.',
         ]);
-
-        $title = $request->title;
-        $image = $request->file('image');
-
+    
+        // Handle the image
         if ($request->hasFile('image')) {
-            $imageName = time() . '.' . $request->image->getClientOriginalExtension();
-            $request->image->move(public_path('/images/project_img'), $imageName);
+            $imageName = time() . '.' . $request->file('image')->getClientOriginalExtension();
+            $request->file('image')->move(public_path('/images/project_img'), $imageName);
         } else {
             $imageName = 'default.jpeg';
         }
+    
+        // Save the project
+        $project = new Project();
+        $project->title = $request->input('title');
+        $project->image = $imageName;
+        $project->user_id = auth()->id();
+        $project->save();
+    
+        return redirect()->route('project.show', ['id' => $project->id]);
 
-        if (Project::where('title', $title)->exists()) {
-            return redirect("/add-project")->withInput()->withError('Title already exists');
-        } else {
-            $project = new Project();
-            $project->title = $title;
-            $project->image = $imageName;
-            $project->user_id = auth()->user()->id;
-            $project->save();
-
-            return response()->json(['id' => $project->id]);
-        }
     }
-
-    public function validateTitle(Request $request)
-    {
-        $title = $request->input('title');
-        $exists = Project::where('title', $title)->exists();
-
-        return response()->json(['exists' => $exists]);
-    }
-
+    
     public function markAsDone(Project $project)
     {
         if ($project->tasks()->count() > 0) {
@@ -112,7 +109,6 @@ class ProjectController extends Controller
 
         $user = auth()->user();
 
-        // Fetch all projects of the authenticated user
         $userProjects = Project::where('user_id', $user->id)
             ->get();
 

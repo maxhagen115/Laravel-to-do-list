@@ -25,31 +25,4 @@
             </div>
         </div>
     </div>
-    
-    <script>
-        document.getElementById('projectForm').addEventListener('submit', function(event) {
-            event.preventDefault();
-            const formData = new FormData(this);
-            const title = document.getElementById('title').value;
-
-            axios.post('{{ route('project.validateTitle') }}', { title: title })
-                .then(response => {
-                    if (response.data.exists) {
-                        toastr.error('Title already exists.');
-                    } else {
-                        axios.post('{{ route('save-project') }}', formData)
-                            .then(response => {
-                                const projectId = response.data.id;
-                                window.location.href = `/project/${projectId}`;
-                            })
-                            .catch(error => {
-                                toastr.error('Error submitting form.');
-                            });
-                    }
-                })
-                .catch(error => {
-                    toastr.error('Error checking title.');
-                });
-        });
-    </script>
 </x-app-layout>

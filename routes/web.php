@@ -29,7 +29,6 @@ Route::middleware('auth')->group(function () {
     Route::get('/project/{id}', [ProjectController::class, 'showProject'])->name('project.show');
     Route::get('/add-project', [ProjectController::class, 'makeProject'])->name('project.add-project');
     Route::post('save-project', [ProjectController::class, 'saveProject'])->name('save-project');
-    Route::post('/project/validate-title', [ProjectController::class, 'validateTitle'])->name('project.validateTitle');
     Route::put('/project/{project}/mark-as-done', [ProjectController::class, 'markAsDone'])->name('project.markAsDone');
     Route::put('/project/{project}/mark-as-doing', [ProjectController::class, 'markAsDoing'])->name('project.markAsDoing');
 

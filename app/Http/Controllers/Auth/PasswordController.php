@@ -7,6 +7,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
+use Illuminate\Validation\Rules;
 
 class PasswordController extends Controller
 {
@@ -16,7 +17,7 @@ class PasswordController extends Controller
     public function update(Request $request): RedirectResponse
     {
         $validated = $request->validate([
-            'password' => 'required|confirmed',
+            'password' => ['required', 'confirmed', Rules\Password::defaults()],
             'current_password' => 'required|current_password',
         ], [
             'password.required' => 'The password field is required',
