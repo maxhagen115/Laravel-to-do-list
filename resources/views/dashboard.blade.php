@@ -1,9 +1,7 @@
 <x-app-layout>
     <div class="container mx-auto p-6">
         <h1 class="text-3xl font-bold mb-6">Dashboard</h1>
-
         <div class="space-y-8">
-
             <!-- Ongoing Projects Section -->
             <div class="bg-white shadow-lg rounded-lg p-4">
                 <h2 class="text-xl font-semibold mb-4">Ongoing Projects</h2>
@@ -12,16 +10,16 @@
                 @else
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
                     @foreach ($ongoingProjects as $project)
-                    <div class="relative bg-white shadow-lg rounded-lg overflow-hidden">
-                        <img src="{{ url('/images/project_img/' . $project->image) }}" alt="{{ $project->title }}" class="w-full h-64 object-cover">
-                        <div class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-                            <h2 class="text-white text-xl font-bold text-center">
-                                <a href="{{ route('project.show', $project->id) }}" class="hover:underline">
+                    <a href="{{ route('project.show', $project->id) }}" class="relative bg-white shadow-lg rounded-lg overflow-hidden block">
+                        <div>
+                            <img src="{{ url('/images/project_img/' . $project->image) }}" alt="{{ $project->title }}" class="w-full h-64 object-cover">
+                            <div class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+                                <h2 class="text-white text-xl font-bold text-center">
                                     {{ Str::ucfirst($project->title) }}
-                                </a>
-                            </h2>
+                                </h2>
+                            </div>
                         </div>
-                    </div>
+                    </a>
                     @endforeach
                 </div>
 
@@ -33,7 +31,6 @@
                 </div>
                 @endif
             </div>
-
 
             <!-- Doing Tasks Section -->
             <div class="bg-white shadow-lg rounded-lg p-4">
@@ -47,8 +44,8 @@
                         <h3 class="text-lg font-semibold text-blue-600">{{ $task->title }}</h3>
                         <p class="text-gray-600">{{ Str::limit($task->description, 100) }}</p>
                         <a href="{{ route('project.show', $task->project_id) }}" class="text-blue-600 hover:underline font-semibold">
-                        View More
-                    </a>
+                            View More
+                        </a>
                     </div>
                     @endforeach
                 </div>
@@ -63,16 +60,16 @@
                 @else
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
                     @foreach ($userProjects as $project)
-                    <div class="relative bg-white shadow-lg rounded-lg overflow-hidden">
-                        <img src="{{ url('/images/project_img/' . $project->image) }}" alt="{{ $project->title }}" class="w-full h-64 object-cover">
-                        <div class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-                            <h2 class="text-white text-xl font-bold text-center">
-                                <a href="{{ route('project.show', $project->id) }}" class="hover:underline">
+                    <a href="{{ route('project.show', $project->id) }}" class="relative bg-white shadow-lg rounded-lg overflow-hidden block">
+                        <div>
+                            <img src="{{ url('/images/project_img/' . $project->image) }}" alt="{{ $project->title }}" class="w-full h-64 object-cover">
+                            <div class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+                                <h2 class="text-white text-xl font-bold text-center">
                                     {{ Str::ucfirst($project->title) }}
-                                </a>
-                            </h2>
+                                </h2>
+                            </div>
                         </div>
-                    </div>
+                    </a>
                     @endforeach
                 </div>
 

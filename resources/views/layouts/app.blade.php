@@ -61,10 +61,6 @@
     @if (Session::has('errors'))
         toastr.error("{{ session('errors')->first() }}")
     @endif
-
-    function goBack() {
-        window.history.back();
-    }
 </script>
 
 </html>

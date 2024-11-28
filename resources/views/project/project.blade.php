@@ -119,8 +119,8 @@
         }
 
         button:disabled {
-            cursor: not-allowed; /* Change cursor to not-allowed */
-            opacity: 0.5; /* Optional: make it look disabled */
+            cursor: not-allowed;
+            opacity: 0.5;
         }
     </style>
 
@@ -330,24 +330,22 @@
         });
 
         // Function to handle marking the project as done
-        function handleMarkAsDone(event) {
-            // Prevent the default action (if needed, such as in a form submission)
-            event.preventDefault();
+            function handleMarkAsDone(event) {
+                // Prevent the default action (if needed, such as in a form submission)
+                event.preventDefault();
 
-            // Show confirmation dialog
-            const confirmed = confirm("Are you sure you want to mark this project as done?");
-            
-            if (confirmed) {
-                // Proceed with marking the project as done if confirmed
-                document.getElementById('markAsDoneForm').submit();
-            } else {
-                // Show the error message
-                toastr.error('Marking project as done canceled');
+                // Show confirmation dialog
+                const confirmed = confirm("Are you sure you want to mark this project as done?");
+                
+                if (confirmed) {
+                    // Proceed with marking the project as done if confirmed
+                    document.getElementById('markAsDoneForm').submit();
+                }
             }
-        }
 
-        // Event listener for the Mark as Done button
-        markAsDoneButton.addEventListener('click', handleMarkAsDone);
+            // Add an event listener to the Mark As Done button
+            markAsDoneButton.addEventListener('click', handleMarkAsDone);
+
 
         function markProjectAsDone() {
             axios.put(`/project/${projectId}/mark-as-done`)
