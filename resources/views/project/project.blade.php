@@ -411,12 +411,18 @@
                     animation: 150,
                     onEnd: function(evt) {
                         if (evt.item.classList.contains('dummy-task')) return;
+
                         const newStatus = evt.to.id;
                         const taskId = evt.item.dataset.id;
+
                         if (evt.item.dataset.status !== newStatus) {
                             updateTaskStatus(taskId, newStatus)
                                 .then(() => {
                                     evt.item.dataset.status = newStatus;
+
+                                    // Update the task's color based on the new status
+                                    updateTaskColor(evt.item, newStatus);
+
                                     toastr.success('Task status updated successfully');
                                 })
                                 .catch(() => toastr.error('Failed to update task status'));
@@ -424,6 +430,25 @@
                     }
                 });
             });
+        }
+
+        // Function to update the task's color
+        function updateTaskColor(taskElement, status) {
+            // Remove all status classes
+            taskElement.classList.remove('bg-blue-200', 'bg-orange-200', 'bg-green-200');
+
+            // Add the new status class
+            switch (status) {
+                case 'planning':
+                    taskElement.classList.add('bg-blue-200');
+                    break;
+                case 'doing':
+                    taskElement.classList.add('bg-orange-200');
+                    break;
+                case 'done':
+                    taskElement.classList.add('bg-green-200');
+                    break;
+            }
         }
 
         function updateTaskStatus(taskId, newStatus) {
