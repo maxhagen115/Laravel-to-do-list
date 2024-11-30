@@ -14,6 +14,18 @@ export default {
             fontFamily: {
                 sans: ['Figtree', ...defaultTheme.fontFamily.sans],
             },
+            keyframes: {
+                gradient: {
+                    '0%, 100%': { backgroundPosition: '0% 50%' },
+                    '50%': { backgroundPosition: '100% 50%' },
+                },
+            },
+            animation: {
+                gradient: 'gradient 5s ease infinite',
+            },
+            backgroundImage: {
+                gradient: 'linear-gradient(45deg, #fbb6ce, #dcb0f2, #8ba6f9)',
+            },
         },
     },
 
