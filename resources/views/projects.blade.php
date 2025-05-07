@@ -29,41 +29,45 @@
             </div>
         </div>
 
-    <script>
-        document.getElementById('search').addEventListener('input', function() {
-            const query = this.value;
-            const baseUrl = '{{ url('/images/project_img') }}';
-            axios.get('{{ route('projects') }}', {
-                    params: {
-                        search: query
-                    }
-                })
-                .then(response => {
-                    const projects = response.data;
-                    const projectList = document.getElementById('project-list');
-                    projectList.innerHTML = '';
+        <script>
+            document.getElementById('search').addEventListener('input', function() {
+                const query = this.value;
+                const baseUrl = '{{ url('/images/project_img') }}';
 
-                    if(projects.length === 0){
-                    projectList.innerHTML = '<p class="text-gray-500 mf-2">No results found</p>';
-                    }else {
-                    projects.forEach(project => {
-                        const projectCard = `
-                            <a href="/project/${project.id}" class="block">
-                                <div class="relative bg-white shadow-lg rounded-lg overflow-hidden">
-                                    <img src="${baseUrl}/${project.image}" alt="${project.title}" class="w-full h-64 object-cover">
-                                    <div class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-                                        <h2 class="text-white text-xl font-bold text-center">${project.title}</h2>
-                                    </div>
-                                </div>
-                            </a>
-                        `;
-                        projectList.innerHTML += projectCard;
+                axios.get('{{ route('projects') }}', {
+                        params: {
+                            search: query
+                        }
+                    })
+                    .then(response => {
+                        const projects = response.data;
+                        const projectList = document.getElementById('project-list');
+                        projectList.innerHTML = '';
+
+                        if (projects.length === 0) {
+                            projectList.innerHTML = '<p class="text-gray-500 mf-2">No results found</p>';
+                        } else {
+                            projects.forEach(project => {
+                                const capitalizedTitle = project.title.charAt(0).toUpperCase() + project.title.slice(1);
+
+                                const projectCard = `
+                                    <a href="/project/${project.id}" class="block">
+                                        <div class="relative bg-white shadow-lg rounded-lg overflow-hidden">
+                                            <img src="${baseUrl}/${project.image}" alt="${capitalizedTitle}" class="w-full h-64 object-cover">
+                                            <div class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+                                                <h2 class="text-white text-xl font-bold text-center">${capitalizedTitle}</h2>
+                                            </div>
+                                        </div>
+                                    </a>
+                                `;
+                                projectList.innerHTML += projectCard;
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching projects:', error);
                     });
-                }
-                })
-                .catch(error => {
-                    console.error('Error fetching projects:', error);
-                });
-        });
-    </script>
+            });
+        </script>
+
 </x-app-layout>

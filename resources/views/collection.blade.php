@@ -17,7 +17,7 @@
                                 <img src="{{ url('/images/project_img/' . $project->image) }}" alt="{{ $project->title }}" class="w-full h-64 object-cover">
                                 <div class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
                                     <h2 class="text-white text-xl font-bold text-center">
-                                        <a href="{{ route('project.show', $project->id) }}" class="hover:underline">
+                                        <a href="{{ route('project.show', $project->id) }}" class="no-underline hover:no-underline focus:no-underline">
                                             {{ Str::ucfirst($project->title) }}
                                         </a>
                                     </h2>
