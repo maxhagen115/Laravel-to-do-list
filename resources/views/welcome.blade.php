@@ -86,6 +86,7 @@
             padding: 50px 20px;
             background-color: #fff;
             text-align: center;
+            position: relative;
         }
 
         .how-it-works h2 {
@@ -117,6 +118,15 @@
             font-size: 1.2rem;
             margin-top: 10px;
             font-weight: bold;
+        }
+
+        /* Image under the features section */
+        .how-it-works img {
+            width: 100%;
+            height: auto;
+            object-fit: cover;
+            margin-top: 30px;
+            /* Space between the features and the image */
         }
     </style>
 </head>
@@ -154,6 +164,8 @@
     <div id="how-it-works" class="how-it-works">
         <h2>How It Works</h2>
         <p>Our To-Do List Manager is simple to use and highly effective. Here's how you can get started:</p>
+
+        <!-- Feature List -->
         <div class="feature">
             <div class="feature-icon">🗂️</div>
             <div class="feature-title">Make a Project</div>
@@ -170,12 +182,130 @@
             <div class="feature-icon">🏆</div>
             <div class="feature-title">Achieve Goals</div>
         </div>
+
+        <!-- Demo Task Board Section -->
+        <div class="mt-24 bg-white rounded-xl shadow-xl p-8 max-w-7xl mx-auto border border-gray-200">
+            <div class="flex items-center justify-between mb-6">
+                <div>
+                    <h2 class="text-3xl font-bold text-gray-800 mb-1">Demo Task Board: <span class="text-blue-500">My Awesome Project</span></h2>
+                    <p class="text-sm text-gray-500">Quickly create tasks and organize them by status to visualize your workflow.</p>
+                </div>
+                <button onclick="openDummyModal()" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold px-5 py-2 rounded shadow">
+                    + Create Task
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Column -->
+                <div class="bg-gray-50 border border-gray-200 p-4 rounded">
+                    <h3 class="text-xl font-semibold mb-3 text-gray-700">Planning</h3>
+                    <div id="demo-planning" class="min-h-[120px] space-y-2"></div>
+                </div>
+                <div class="bg-gray-50 border border-gray-200 p-4 rounded">
+                    <h3 class="text-xl font-semibold mb-3 text-gray-700">Doing</h3>
+                    <div id="demo-doing" class="min-h-[120px] space-y-2"></div>
+                </div>
+                <div class="bg-gray-50 border border-gray-200 p-4 rounded">
+                    <h3 class="text-xl font-semibold mb-3 text-gray-700">Done</h3>
+                    <div id="demo-done" class="min-h-[120px] space-y-2"></div>
+                </div>
+            </div>
+        </div>
     </div>
 
-
-    <div class="bg-gray-200 flex items-end justify-center text-center text-sm text-gray-500 dark:text-gray-400 sm:text-right sm:ml-0">
-        Laravel v{{ Illuminate\Foundation\Application::VERSION }} (PHP v{{ PHP_VERSION }})
+    <!-- Modal -->
+    <div id="dummyModal" class="fixed inset-0 bg-black bg-opacity-40 hidden flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-6 w-80 shadow-lg">
+            <h2 class="text-lg font-bold mb-4">Create a Task</h2>
+            <input type="text" id="dummyTaskTitle" placeholder="Task title" class="w-full mb-3 px-3 py-2 border rounded" />
+            <select id="dummyTaskStatus" class="w-full mb-4 px-3 py-2 border rounded">
+                <option value="planning">Planning</option>
+                <option value="doing">Doing</option>
+                <option value="done">Done</option>
+            </select>
+            <div class="flex justify-end space-x-2">
+                <button onclick="closeDummyModal()" class="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400">Cancel</button>
+                <button onclick="createDummyTask()" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">Add</button>
+            </div>
+        </div>
     </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
+    <script>
+        const dummyModal = document.getElementById("dummyModal");
+        const dummyTaskTitle = document.getElementById("dummyTaskTitle");
+        const dummyTaskStatus = document.getElementById("dummyTaskStatus");
+
+        function openDummyModal() {
+            dummyModal.classList.remove("hidden");
+            dummyTaskTitle.value = "";
+            dummyTaskStatus.value = "planning";
+        }
+
+        function closeDummyModal() {
+            dummyModal.classList.add("hidden");
+        }
+
+        function createDummyTask() {
+            const title = dummyTaskTitle.value.trim();
+            const status = dummyTaskStatus.value;
+
+            if (title === "") {
+                alert("Please enter a task title");
+                return;
+            }
+
+            const task = document.createElement("div");
+            task.className = "text-gray-800 px-4 py-2 rounded shadow-sm text-sm font-medium cursor-pointer";
+
+            // Color based on status
+            switch (status) {
+                case "planning":
+                    task.classList.add("bg-blue-200");
+                    break;
+                case "doing":
+                    task.classList.add("bg-orange-200");
+                    break;
+                case "done":
+                    task.classList.add("bg-green-200");
+                    break;
+                default:
+                    task.classList.add("bg-gray-100");
+            }
+
+            task.innerText = title;
+            document.getElementById(`demo-${status}`).appendChild(task);
+
+            toastr.success("Task created successfully");
+            closeDummyModal();
+        }
+
+
+        // Enable drag-and-drop between columns
+        ['planning', 'doing', 'done'].forEach(id => {
+            new Sortable(document.getElementById(`demo-${id}`), {
+                group: 'shared',
+                animation: 150,
+                onAdd: function(evt) {
+                    const task = evt.item;
+
+                    // Remove old background classes
+                    task.classList.remove("bg-blue-200", "bg-orange-200", "bg-green-200");
+
+                    // Add new color based on the new column
+                    if (evt.to.id === "demo-planning") {
+                        task.classList.add("bg-blue-200");
+                    } else if (evt.to.id === "demo-doing") {
+                        task.classList.add("bg-orange-200");
+                    } else if (evt.to.id === "demo-done") {
+                        task.classList.add("bg-green-200");
+                    }
+                }
+            });
+        });
+    </script>
+
 
     <script>
         toastr.options = {
