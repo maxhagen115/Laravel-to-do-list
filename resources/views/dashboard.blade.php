@@ -25,7 +25,7 @@
 
                 <!-- View More Button -->
                 <div class="text-center mt-4">
-                    <a href="{{ route('projects') }}" class="text-blue-600 hover:underline font-semibold">
+                    <a href="{{ route('projects') }}" class="text-blue-600 hover:underline font-semibold no-underline hover:no-underline focus:no-underline">
                         View More
                     </a>
                 </div>
@@ -43,7 +43,7 @@
                     <div class="bg-white shadow-md rounded-lg p-4">
                         <h3 class="text-lg font-semibold text-blue-600">{{ $task->title }}</h3>
                         <p class="text-gray-600">{{ Str::limit($task->description, 100) }}</p>
-                        <a href="{{ route('project.show', $task->project_id) }}" class="text-blue-600 hover:underline font-semibold">
+                        <a href="{{ route('project.show', $task->project_id) }}" class="text-blue-600 font-semibold no-underline hover:no-underline focus:no-underline">
                             View More
                         </a>
                     </div>
@@ -75,7 +75,7 @@
 
                 <!-- View More Button -->
                 <div class="text-center mt-4">
-                    <a href="{{ route('show.collection') }}" class="text-blue-600 hover:underline font-semibold">
+                    <a href="{{ route('show.collection') }}" class="text-blue-600 font-semibold no-underline hover:no-underline focus:no-underline">
                         View More
                     </a>
                 </div>
