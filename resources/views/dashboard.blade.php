@@ -24,11 +24,13 @@
                 </div>
 
                 <!-- View More Button -->
+                @if($totalOngoingProjects > 4)
                 <div class="text-center mt-4">
                     <a href="{{ route('projects') }}" class="text-blue-600 hover:underline font-semibold no-underline hover:no-underline focus:no-underline">
                         View More
                     </a>
                 </div>
+                @endif
                 @endif
             </div>
 
@@ -73,12 +75,14 @@
                     @endforeach
                 </div>
 
+                @if($totalUserProjects > 4)
                 <!-- View More Button -->
                 <div class="text-center mt-4">
                     <a href="{{ route('show.collection') }}" class="text-blue-600 font-semibold no-underline hover:no-underline focus:no-underline">
                         View More
                     </a>
                 </div>
+                @endif
                 @endif
             </div>
         </div>
