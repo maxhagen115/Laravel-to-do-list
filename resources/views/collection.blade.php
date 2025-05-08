@@ -7,7 +7,7 @@
             <!-- Collection of Projects Section -->
             <div class="bg-white shadow-lg rounded-lg p-4">
                 <h2 class="text-xl font-semibold mb-4">All projects</h2>
-                <p class="text-small font-semibold mb-4">All project from you that are done</p>
+                <p class="text-small font-semibold mb-4">All projects that are finished or deleted</p>
                 @if($userProjects->isEmpty())
                     <p>You have no projects.</p>
                 @else

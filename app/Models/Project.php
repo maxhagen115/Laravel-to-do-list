@@ -16,6 +16,10 @@ class Project extends Model
         'is_done',
     ];
 
+    protected $casts = [
+        'deleted' => 'boolean',
+    ];
+
     public function user()
     {
         return $this->belongsTo(User::class);

@@ -17,7 +17,8 @@ class ProjectController extends Controller
         $userId = auth()->id();
 
         $query = Project::where('user_id', $userId)
-            ->where('is_done', 'not_done');
+            ->where('is_done', 'not_done')
+            ->where('deleted', 0);
 
         if ($search) {
             $projects = $query->where('title', 'like', "%{$search}%")->get();
@@ -65,7 +66,7 @@ class ProjectController extends Controller
             'title.required' => 'The title input is required',
             'title.unique' => 'You already have a project with this title.',
         ]);
-    
+
         // Handle the image
         if ($request->hasFile('image')) {
             $imageName = time() . '.' . $request->file('image')->getClientOriginalExtension();
@@ -73,18 +74,17 @@ class ProjectController extends Controller
         } else {
             $imageName = 'default.jpeg';
         }
-    
+
         // Save the project
         $project = new Project();
         $project->title = $request->input('title');
         $project->image = $imageName;
         $project->user_id = auth()->id();
         $project->save();
-    
-        return redirect()->route('project.show', ['id' => $project->id]);
 
+        return redirect()->route('project.show', ['id' => $project->id]);
     }
-    
+
     public function markAsDone(Project $project)
     {
         if ($project->tasks()->count() > 0) {
@@ -97,7 +97,8 @@ class ProjectController extends Controller
         }
     }
 
-    public function markAsDoing(Project $project){
+    public function markAsDoing(Project $project)
+    {
         $project->is_done = 'not_done';
         $project->save();
 
@@ -110,8 +111,32 @@ class ProjectController extends Controller
         $user = auth()->user();
 
         $userProjects = Project::where('user_id', $user->id)
+            ->where('is_done', 'done')
+            ->Orwhere('deleted', 1)
             ->get();
 
         return view('collection', compact('userProjects'));
+    }
+
+    public function updateTitle(Request $request, $id)
+    {
+        $request->validate([
+            'title' => 'required|string|max:255',
+        ]);
+
+        $project = Project::where('id', $id)->where('user_id', auth()->id())->firstOrFail();
+        $project->title = $request->title;
+        $project->save();
+
+        return redirect()->back()->with('success', 'Project title updated successfully.');
+    }
+
+    public function softDelete($id)
+    {
+        $project = Project::where('id', $id)->where('user_id', auth()->id())->firstOrFail();
+        $project->deleted = true; // Assuming 'deleted' is a boolean column
+        $project->save();
+
+        return redirect()->back()->with('success', 'Project deleted successfully.');
     }
 }

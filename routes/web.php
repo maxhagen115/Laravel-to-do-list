@@ -31,6 +31,9 @@ Route::middleware('auth')->group(function () {
     Route::post('save-project', [ProjectController::class, 'saveProject'])->name('save-project');
     Route::put('/project/{project}/mark-as-done', [ProjectController::class, 'markAsDone'])->name('project.markAsDone');
     Route::put('/project/{project}/mark-as-doing', [ProjectController::class, 'markAsDoing'])->name('project.markAsDoing');
+    Route::put('/project/{id}/update-title', [ProjectController::class, 'updateTitle'])->name('project.updateTitle');
+    Route::put('/project/{id}/soft-delete', [ProjectController::class, 'softDelete'])->name('project.softDelete');
+
 
     Route::get('/collection', [ProjectController::class, 'showCollection'])->name('show.collection');
 
