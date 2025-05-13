@@ -34,13 +34,17 @@ class DashboardController extends Controller
         $doingTasks = Task::query()
             ->where('status', 'doing')
             ->with('project')
+            ->take(8)
             ->get();
+
+        $totalDoingTasks = Task::where('status', 'doing')->count();
+
 
         $userProjects = Project::query()
             ->where('user_id', $user->id)
             ->where(function ($q) {
                 $q->where('is_done', 'done')
-                    ->orWhere('deleted', 1); 
+                    ->orWhere('deleted', 1);
             })
             ->take(4)
             ->get();
@@ -59,6 +63,21 @@ class DashboardController extends Controller
             'doingTasks'           => $doingTasks,
             'userProjects'         => $userProjects,
             'totalUserProjects'    => $totalUserProjects,
+            'totalDoingTasks'      => $totalDoingTasks,
         ]);
     }
+    public function loadMoreDoingTasks(Request $request)
+    {
+        $offset = $request->input('offset', 8);
+    
+        $moreTasks = Task::query()
+            ->where('status', 'doing')
+            ->with('project')
+            ->skip($offset)
+            ->take(8)
+            ->get();
+    
+        return response()->json($moreTasks);
+    }
+    
 }
