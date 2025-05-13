@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Validator;
 
 class ProjectController extends Controller
 {
@@ -120,16 +121,56 @@ class ProjectController extends Controller
 
     public function updateTitle(Request $request, $id)
     {
+        $project = Project::where('id', $id)
+            ->where('user_id', auth()->id())
+            ->firstOrFail();
+    
         $request->validate([
-            'title' => 'required|string|max:255',
+            'title' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('projects')
+                    ->where(fn($query) => $query->where('user_id', auth()->id()))
+                    ->ignore($project->id),
+            ],
+        ], [
+            'title.unique' => 'You already have a project with this title.',
+        ]);
+    
+        $project->title = $request->title;
+        $project->save();
+    
+        return redirect()->back()->with('success', 'Project title updated successfully.');
+    }
+    public function updateTitleInline(Request $request, Project $project)
+    {
+        $validator = Validator::make($request->all(), [
+            'title' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('projects')
+                    ->where(fn($query) => $query->where('user_id', $request->user()->id))
+                    ->ignore($project->id),
+            ],
+        ], [
+            'title.unique' => 'You already have a project with this title.',
         ]);
 
-        $project = Project::where('id', $id)->where('user_id', auth()->id())->firstOrFail();
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => $validator->errors()->first('title')
+            ], 422);
+        }
+
         $project->title = $request->title;
         $project->save();
 
-        return redirect()->back()->with('success', 'Project title updated successfully.');
+        return response()->json(['success' => true]);
     }
+
+
 
     public function softDelete($id)
     {

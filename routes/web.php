@@ -32,6 +32,8 @@ Route::middleware('auth')->group(function () {
     Route::put('/project/{project}/mark-as-done', [ProjectController::class, 'markAsDone'])->name('project.markAsDone');
     Route::put('/project/{project}/mark-as-doing', [ProjectController::class, 'markAsDoing'])->name('project.markAsDoing');
     Route::put('/project/{id}/update-title', [ProjectController::class, 'updateTitle'])->name('project.updateTitle');
+    Route::post('/project/{project}/update-title', [ProjectController::class, 'updateTitleInline'])->name('project.update-title-inline');
+
     Route::put('/project/{id}/soft-delete', [ProjectController::class, 'softDelete'])->name('project.softDelete');
 
 

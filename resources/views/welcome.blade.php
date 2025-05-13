@@ -184,7 +184,7 @@
         </div>
 
         <!-- Demo Task Board Section -->
-        <div class="mt-24 bg-white rounded-xl shadow-xl p-8 max-w-7xl mx-auto border border-gray-200">
+        <div class="mt-24 mb-36 bg-white rounded-xl shadow-xl p-8 max-w-7xl mx-auto border border-gray-200">
             <div class="flex items-center justify-between mb-6">
                 <div>
                     <h2 class="text-3xl font-bold text-gray-800 mb-1">Demo Task Board: <span class="text-blue-500">My Awesome Project</span></h2>
@@ -217,7 +217,7 @@
     <div id="dummyModal" class="fixed inset-0 bg-black bg-opacity-40 hidden flex items-center justify-center z-50">
         <div class="bg-white rounded-lg p-6 w-80 shadow-lg">
             <h2 class="text-lg font-bold mb-4">Create a Task</h2>
-            <input type="text" id="dummyTaskTitle" placeholder="Task title" class="w-full mb-3 px-3 py-2 border rounded" />
+            <input type="text" id="dummyTaskTitle" placeholder="E.g. Setup environment" class="w-full mb-3 px-3 py-2 border rounded" />
             <select id="dummyTaskStatus" class="w-full mb-4 px-3 py-2 border rounded">
                 <option value="planning">Planning</option>
                 <option value="doing">Doing</option>

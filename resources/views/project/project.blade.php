@@ -126,7 +126,10 @@
 
     <body class="bg-gray-200">
         <div class="container mx-auto p-4">
-            <h1 class="text-3xl font-bold mb-4">Project Task Board for <span class="text-blue-500">{{ Str::ucfirst($project->title) }}</span></h1>
+        <h1 class="text-3xl font-bold mb-4">Project Task Board for
+            <span id="project-title-display" class="text-blue-500 cursor-pointer">{{ Str::ucfirst($project->title) }}</span>
+            <input type="text" id="project-title-input" class="text-blue-500 bg-white border border-gray-300 rounded p-1 hidden" value="{{ $project->title }}">
+        </h1>
 
             @if ($project->is_done == 'not_done')
                 <button id="openModal" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-4">
@@ -456,6 +459,89 @@
         }
     });
 </script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        if (window.projectTitleEditInitialized) return;
+        window.projectTitleEditInitialized = true;
+
+        const display = document.getElementById('project-title-display');
+        const input = document.getElementById('project-title-input');
+
+        let isUpdating = false;
+        let enterPressed = false;
+
+        display.addEventListener('click', () => {
+            display.classList.add('hidden');
+            input.classList.remove('hidden');
+            input.focus();
+        });
+
+        input.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                enterPressed = true;
+                updateTitle();
+            }
+        });
+
+        input.addEventListener('blur', () => {
+            if (enterPressed) {
+                enterPressed = false;
+                return;
+            }
+            updateTitle();
+        });
+
+        function updateTitle() {
+            if (isUpdating) return;
+            isUpdating = true;
+
+            const newTitle = input.value.trim();
+            if (!newTitle) {
+                isUpdating = false;
+                return;
+            }
+
+            fetch("{{ route('project.update-title-inline', $project->id) }}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRF-TOKEN": "{{ csrf_token() }}"
+                },
+                body: JSON.stringify({ title: newTitle })
+            })
+            .then(async res => {
+                const data = await res.json();
+
+                if (!res.ok) {
+                    if (data.message) {
+                        toastr.error(data.message);
+                    } else {
+                        toastr.error('Er trad een fout op. Probeer het opnieuw.');
+                    }
+                    throw new Error('Validation failed');
+                }
+
+                if (data.success) {
+                    display.textContent = newTitle.charAt(0).toUpperCase() + newTitle.slice(1);
+                    toastr.success('Project title updated successfully');
+                } else if (data.message) {
+                    toastr.error(data.message);
+                } else {
+                    toastr.error('Er ging iets mis, probeer het opnieuw.');
+                }
+            })
+            .catch(() => {})
+            .finally(() => {
+                input.classList.add('hidden');
+                display.classList.remove('hidden');
+                isUpdating = false;
+            });
+        }
+    });
+</script>
+
+
 
     </body>
 </x-app-layout>
