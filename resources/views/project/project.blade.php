@@ -333,20 +333,23 @@
         });
 
         // Function to handle marking the project as done
-            function handleMarkAsDone(event) {
-                // Prevent the default action (if needed, such as in a form submission)
-                event.preventDefault();
+        function handleMarkAsDone(event) {
+            event.preventDefault();
 
-                // Show confirmation dialog
-                const confirmed = confirm("Are you sure you want to mark this project as done?");
-                
-                if (confirmed) {
-                    // Proceed with marking the project as done if confirmed
-                    document.getElementById('markAsDoneForm').submit();
-                }
+            const totalTasks = document.querySelectorAll('.task').length;
+            const doneTasks = document.querySelectorAll('#done .task').length;
+
+            let message = "Are you sure you want to mark this project as done?";
+            if (totalTasks > doneTasks) {
+                message += "\nYou still have tasks not marked as done.";
             }
 
-            // Add an event listener to the Mark As Done button
+            const confirmed = confirm(message);
+
+            if (confirmed) {
+                document.getElementById('markAsDoneForm').submit();
+            }
+        }
             markAsDoneButton.addEventListener('click', handleMarkAsDone);
 
 
