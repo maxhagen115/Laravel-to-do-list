@@ -20,6 +20,7 @@ use App\Http\Controllers\DashboardController;
 Route::get('/', [DashboardController::class, 'dashboard'])->name('dashboard');
 Route::get('/dashboard', [DashboardController::class, 'dashboard'])->name('dashboard');
 Route::get('/dashboard/doing-tasks/load-more', [DashboardController::class, 'loadMoreDoingTasks'])->name('tasks.loadMoreDoing');
+Route::post('/dashboard/finish-awesome-project', [DashboardController::class, 'finishAwesomeProject'])->name('dashboard.finishAwesomeProject')->middleware('auth');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

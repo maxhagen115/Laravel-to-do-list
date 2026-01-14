@@ -1,9 +1,37 @@
 <x-app-layout>
     <style>
         .task {
+            position: relative;
+            padding-right: 2.5rem;
+            transition: background-color 0.3s;
             cursor: pointer;
         }
 
+        .task .edit-icon {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background-color: white;
+            border-radius: 4px;
+            padding: 0.25rem;
+            cursor: pointer;
+            display: none;
+            z-index: 10;
+        }
+
+        .task:hover .edit-icon {
+            display: inline-block;
+        }
+
+        .task .edit-input {
+            width: 100%;
+            background-color: white;
+            border: 1px solid #ccc;
+            padding: 0.25rem;
+            border-radius: 4px;
+            display: none;
+        }
+        
         .spinner-overlay {
             position: fixed;
             top: 0;

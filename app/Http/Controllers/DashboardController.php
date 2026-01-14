@@ -39,6 +39,20 @@ class DashboardController extends Controller
 
         $totalDoingTasks = Task::where('status', 'doing')->count();
 
+        // Check if "My Awesome Project" exists and has any tasks (in any section)
+        // Using case-insensitive check to handle variations
+        $awesomeProject = Project::where('user_id', $user->id)
+            ->whereRaw('LOWER(title) = ?', [strtolower('My Awesome Project')])
+            ->first();
+        
+        $hasAwesomeProjectTasks = false;
+        $awesomeProjectId = null;
+        
+        if ($awesomeProject) {
+            // Check if project has any tasks at all (planning, doing, or done)
+            $hasAwesomeProjectTasks = Task::where('project_id', $awesomeProject->id)->exists();
+            $awesomeProjectId = $awesomeProject->id;
+        }
 
         $userProjects = Project::query()
             ->where('user_id', $user->id)
@@ -64,6 +78,8 @@ class DashboardController extends Controller
             'userProjects'         => $userProjects,
             'totalUserProjects'    => $totalUserProjects,
             'totalDoingTasks'      => $totalDoingTasks,
+            'hasAwesomeProjectTasks' => $hasAwesomeProjectTasks,
+            'awesomeProjectId'     => $awesomeProjectId,
         ]);
     }
     public function loadMoreDoingTasks(Request $request)
@@ -78,6 +94,20 @@ class DashboardController extends Controller
             ->get();
     
         return response()->json($moreTasks);
+    }
+
+    public function finishAwesomeProject(Request $request)
+    {
+        $user = Auth::user();
+        
+        $awesomeProject = Project::where('user_id', $user->id)
+            ->whereRaw('LOWER(title) = ?', [strtolower('My Awesome Project')])
+            ->firstOrFail();
+        
+        // Delete all tasks from "My Awesome Project"
+        Task::where('project_id', $awesomeProject->id)->delete();
+        
+        return response()->json(['success' => true, 'message' => 'Project successfully ended']);
     }
     
 }

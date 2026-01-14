@@ -1,6 +1,14 @@
 <x-app-layout>
     <div class="container mx-auto p-6">
-        <h1 class="text-3xl font-bold mb-6">Dashboard</h1>
+        <div class="flex items-center justify-between mb-6">
+            <h1 class="text-3xl font-bold">Dashboard</h1>
+            @if($hasAwesomeProjectTasks)
+            <button id="finishProjectBtn"
+                class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition font-semibold shadow-md">
+                Finish Project
+            </button>
+            @endif
+        </div>
         <div class="space-y-8">
             <!-- Ongoing Projects Section -->
             <div class="bg-white shadow-lg rounded-lg p-4">
@@ -108,8 +116,52 @@
         </div>
     </div>
 
+    <!-- Confetti Library -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            // Finish Project Button Handler
+            const finishProjectBtn = document.getElementById('finishProjectBtn');
+            if (finishProjectBtn) {
+                finishProjectBtn.addEventListener('click', () => {
+                    // Show confirmation popup
+                    if (confirm('Are you sure you want to finish this project?')) {
+                        // User clicked OK
+                        finishProjectBtn.disabled = true;
+                        finishProjectBtn.innerText = 'Finishing...';
+
+                        // Set up CSRF token for axios
+                        axios.defaults.headers.common['X-CSRF-TOKEN'] = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+                        
+                        axios.post("{{ route('dashboard.finishAwesomeProject') }}")
+                            .then(response => {
+                                // Show confetti animation
+                                confetti({
+                                    particleCount: 100,
+                                    spread: 70,
+                                    origin: { y: 0.6 }
+                                });
+
+                                // Show success toastr message
+                                toastr.success('Project successfully ended');
+
+                                // Reload the page after a short delay to reflect changes
+                                setTimeout(() => {
+                                    window.location.reload();
+                                }, 1500);
+                            })
+                            .catch(error => {
+                                toastr.error('Failed to finish project.');
+                                console.error('Finish project error:', error);
+                                finishProjectBtn.disabled = false;
+                                finishProjectBtn.innerText = 'Finish Project';
+                            });
+                    }
+                    // If user clicked Cancel, do nothing
+                });
+            }
+
             const button = document.getElementById('loadMoreDoingTasks');
             const grid = document.getElementById('doingTasksGrid');
             let offset = 8;
